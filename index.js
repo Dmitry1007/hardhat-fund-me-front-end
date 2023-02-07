@@ -4,9 +4,11 @@ import { abi, contractAddress } from "./constants.js";
 const connectButton = document.getElementById("connectButton");
 const balanceButton = document.getElementById("balanceButton");
 const fundButton = document.getElementById("fundButton");
+const withdrawButton = document.getElementById("withdrawButton");
 connectButton.onclick = connect;
 balanceButton.onclick = getBalance;
 fundButton.onclick = fund;
+withdrawButton.onclick = withdraw;
 
 async function connect() {
   if (typeof window.ethereum !== "undefined") {
@@ -71,4 +73,23 @@ function listenForTransactionMine(transactionResponse, provider) {
       reject(error);
     }
   });
+}
+
+async function withdraw() {
+  console.log(`Withdrawing...`);
+  if (typeof window.ethereum !== "undefined") {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, abi, signer);
+    try {
+      const transactionResponse = await contract.withdraw();
+      await listenForTransactionMine(transactionResponse, provider);
+      // await transactionResponse.wait(1)
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    withdrawButton.innerHTML = "Please install MetaMask";
+  }
 }
