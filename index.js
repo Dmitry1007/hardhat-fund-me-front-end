@@ -51,6 +51,7 @@ async function fund() {
         value: ethers.utils.parseEther(ethAmount),
       });
       await listenForTransactionMine(transactionResponse, provider);
+      document.getElementById("ethAmount").value = null;
     } catch (error) {
       console.log(error);
     }
